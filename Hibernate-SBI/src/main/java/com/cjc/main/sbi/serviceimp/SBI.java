@@ -187,7 +187,7 @@ public class SBI implements RBI {
 	public void update_account() {
 		// TODO Auto-generated method stub
 		
-		Session session = new HibernateUtil().getSessionFactory().openSession();
+		Session session = HibernateUtil.getSessionFactory().openSession();
 		
 		System.out.println("Enter the Account Number :- ");
 		long acno = sc.nextLong();
