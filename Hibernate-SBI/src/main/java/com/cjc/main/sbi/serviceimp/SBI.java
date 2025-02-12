@@ -1,9 +1,8 @@
 package com.cjc.main.sbi.serviceimp;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
-
 import org.hibernate.Session;
-
 import com.cjc.main.sbi.service.RBI;
 import com.cjc.main.sbi.config.*;
 import com.cjc.main.sbi.exc.AccountNumberNotValidException;
@@ -22,8 +21,9 @@ public class SBI implements RBI {
 		}
 	}
 	
-	public void accnovalid(long acno) throws AccountNumberNotValidException
+	public int accnovalid(long acno) throws AccountNumberNotValidException
 	{
+		
 		int size = 0;
 		while(acno!=0)
 		{
@@ -31,9 +31,10 @@ public class SBI implements RBI {
 			size++;
 		}
 		
-		if(size<10 || size>10) {
+		if(size!=10) {
 			throw new AccountNumberNotValidException("Account should have 10 digits");
 		}
+		return size;
 	}
 	
 	public void mobnovalid(long mobno) throws MobileNumberNotValidException
@@ -45,7 +46,7 @@ public class SBI implements RBI {
 			size++;
 		}
 		
-		if(size<10 || size>10) {
+		if(size!=10) {
 			throw new MobileNumberNotValidException("Mobile number should have 10 digits");
 		}
 	}
@@ -56,6 +57,7 @@ public class SBI implements RBI {
 			throw new AmountNotValidException("Amount should be greater than 0");
 		}
 	}
+	
 
 	Scanner sc = new Scanner(System.in);
 	
@@ -66,19 +68,48 @@ public class SBI implements RBI {
 		
 		Account account = new Account();
 		
-		System.out.println("Enter the 10 digit Account Number :- ");
-		long account_no = sc.nextLong();
 		
-		try
+		
+		try {
+			System.out.println("Enter the 10 digit Account Number :- ");
+			long account_no = sc.nextLong();
+				if(accnovalid(account_no)==10)
+				{
+					account.setAccno(account_no);
+				}
+			}
+			catch(AccountNumberNotValidException e)
+			{
+				System.out.println(e.getMessage()+"Please Enter the Account number of 10 digits only.");
+			}
+		catch(InputMismatchException e)
 		{
+			System.out.println("Please Enter the Account number in digits only.");
+		}
+			
+			
+		
+		/*try
+		{
+			account.setAccno(account_no);
+		}
+		catch(InputMismatchException e)
+		{
+			
+			System.out.println("\nAccount can only have digits...\n");
+			create_account();
+		}
+		
+		try {
 			accnovalid(account_no);
+			account.setAccno(account_no);
 		}
 		catch(AccountNumberNotValidException e)
 		{
 			System.out.println(e.getMessage()+"\nPlease enter the details correctly");
 			create_account();
-		}
-		account.setAccno(account_no);
+		}*/
+		
 		
 		System.out.println("Enter the First Name :- ");
 		account.setName(sc.next());
@@ -112,6 +143,7 @@ public class SBI implements RBI {
 		
 		System.out.println("Enter the Age :- ");
 		int age = sc.nextInt();
+		
 		try
 		{
 			agevalid(age);
