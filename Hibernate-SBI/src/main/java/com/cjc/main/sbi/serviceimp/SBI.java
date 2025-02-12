@@ -281,18 +281,37 @@ public class SBI implements RBI {
 		
 		Session session = new HibernateUtil().getSessionFactory().openSession();
 		
-		System.out.println("Enter the Account Number :- ");
-		long acno = sc.nextLong();
 		
-		Account account = session.get(Account.class, acno);
-		System.out.println(account.getAccno());
-		System.out.println(account.getName()+" "+account.getMidname()+" "+account.getSurname());
-		System.out.println(account.getGender());
-		System.out.println(account.getAge());
-		System.out.println(account.getMobno());
-		System.out.println(account.getAadharno());
-		System.out.println(account.getAddress());
-		System.out.println(account.getBalance());
+		
+		try {
+			
+			System.out.println("Enter the Account Number :- ");
+			long acno = sc.nextLong();
+			
+			if(accnovalid(acno)==10)
+			{
+				
+				Account account = session.get(Account.class, acno);
+				System.out.println(account.getAccno());
+				System.out.println(account.getName()+" "+account.getMidname()+" "+account.getSurname());
+				System.out.println(account.getGender());
+				System.out.println(account.getAge());
+				System.out.println(account.getMobno());
+				System.out.println(account.getAadharno());
+				System.out.println(account.getAddress());
+				System.out.println(account.getBalance());
+			}
+		}
+		catch(AccountNumberNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
+			view_account();
+		}
+		catch(NullPointerException e)
+		{
+			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
+			view_account();
+		}
 		
 	}
 
@@ -302,65 +321,81 @@ public class SBI implements RBI {
 		
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		
-		System.out.println("Enter the Account Number :- ");
-		long acno = sc.nextLong();
-		
-		Account account = session.get(Account.class, acno);
-		
-		System.out.println("Select a option from below to update :- \n1. Update Name \n2. Update Age \n3. Update Contact Number \n4. Update Aadhar Number \n4. Update Address");
-		
-		int i = sc.nextInt();
-		
-		switch(i)
+		try {
+			
+			System.out.println("Enter the Account Number :- ");
+			long acno = sc.nextLong();
+			
+			if(accnovalid(acno)==10)
+			{
+				Account account = session.get(Account.class, acno);
+				
+				System.out.println("Select a option from below to update :- \n1. Update Name \n2. Update Age \n3. Update Contact Number \n4. Update Aadhar Number \n4. Update Address");
+				
+				int i = sc.nextInt();
+				
+				switch(i)
+				{
+				
+				case 1:
+					System.out.println("Enter the Name to be updated :- ");
+					System.out.println("First Name :- ");
+					account.setName(sc.next());
+					
+					System.out.println("Middle Name :- ");
+					account.setMidname(sc.next());
+					
+					System.out.println("Last Name :- ");
+					account.setSurname(sc.next());
+					
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 2:
+					System.out.println("Enter the Age to be updated :- ");
+					account.setAge(sc.nextInt());
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 3:
+					System.out.println("Enter the Contact Number to be updated :- ");
+					account.setMobno(sc.nextLong());
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 4:
+					System.out.println("Enter the Aadhar Number to be updated :- ");
+					account.setAadharno(sc.nextLong());
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 5:
+					System.out.println("Enter the Permanent address to be updated :- ");
+					account.setAddress(sc.next()+sc.nextLine());
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				default:
+					System.out.println("Enter the correct selection.");
+					update_account();
+					break;
+				}
+			}
+		}
+		catch(AccountNumberNotValidException e)
 		{
-		
-		case 1:
-			System.out.println("Enter the Name to be updated :- ");
-			System.out.println("First Name :- ");
-			account.setName(sc.next());
-			
-			System.out.println("Middle Name :- ");
-			account.setMidname(sc.next());
-			
-			System.out.println("Last Name :- ");
-			account.setSurname(sc.next());
-			
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 2:
-			System.out.println("Enter the Age to be updated :- ");
-			account.setAge(sc.nextInt());
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 3:
-			System.out.println("Enter the Contact Number to be updated :- ");
-			account.setMobno(sc.nextLong());
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 4:
-			System.out.println("Enter the Aadhar Number to be updated :- ");
-			account.setAadharno(sc.nextLong());
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 5:
-			System.out.println("Enter the Permanent address to be updated :- ");
-			account.setAddress(sc.next()+sc.nextLine());
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		default:
-			System.out.println("Enter the correct selection.");
+			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
 			update_account();
-			break;
+		}
+		catch(NullPointerException e)
+		{
+			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
+			update_account();
 		}
 		
 	}
@@ -372,54 +407,72 @@ public class SBI implements RBI {
 		System.out.println("Select which type of transaction you want to do :- \n1. Withdraw Money \n2. Deposit Money \n3. Cancel transaction");
 		int i = sc.nextInt();
 		
-		System.out.println("Enter the Account Number :- ");
-		long acno = sc.nextLong();
-		
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Account account = session.get(Account.class, acno);
-		
-		switch(i)
-		{
-		case 1:
-			System.out.println("Enter the amount to withdraw :- ");
-			double wdt_bal = sc.nextDouble();
+		try {
 			
-			try
+			System.out.println("Enter the Account Number :- ");
+			long acno = sc.nextLong();
+			
+			if(accnovalid(acno)==10)
 			{
-				amtzero(wdt_bal);
+				Session session = HibernateUtil.getSessionFactory().openSession();
+				Account account = session.get(Account.class, acno);
+				
+				switch(i)
+				{
+				case 1:
+					System.out.println("Enter the amount to withdraw :- ");
+					double wdt_bal = sc.nextDouble();
+					
+					try
+					{
+						amtzero(wdt_bal);
+					}
+					catch(AmountNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						transaction();
+					}
+					account.setBalance(account.getBalance()-wdt_bal);
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 2:
+					System.out.println("Enter the amount to deposit :- ");
+					double dep_bal = sc.nextDouble();
+					
+					try
+					{
+						amtzero(dep_bal);
+					}
+					catch(AmountNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						create_account();
+					}
+					account.setBalance(account.getBalance()+dep_bal);
+					session.merge(account);
+					session.beginTransaction().commit();
+					break;
+					
+				case 3:
+					System.exit(0);
+					
+				}
 			}
-			catch(AmountNotValidException e)
-			{
-				System.out.println(e.getMessage());
-				transaction();
-			}
-			account.setBalance(account.getBalance()-wdt_bal);
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 2:
-			System.out.println("Enter the amount to deposit :- ");
-			double dep_bal = sc.nextDouble();
-			
-			try
-			{
-				amtzero(dep_bal);
-			}
-			catch(AmountNotValidException e)
-			{
-				System.out.println(e.getMessage());
-				create_account();
-			}
-			account.setBalance(account.getBalance()+dep_bal);
-			session.merge(account);
-			session.beginTransaction().commit();
-			break;
-			
-		case 3:
-			System.exit(0);
-			
 		}
+		catch(AccountNumberNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
+			view_account();
+		}
+		catch(NullPointerException e)
+		{
+			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
+			view_account();
+		}
+		
+		
 		
 	}
 
@@ -427,16 +480,32 @@ public class SBI implements RBI {
 	public void delete_account() {
 		// TODO Auto-generated method stub
 		
-		System.out.println("Enter the Account Number :- ");
-		long acno = sc.nextLong();
-		
-		Session session = HibernateUtil.getSessionFactory().openSession();
-		Account account = session.get(Account.class, acno);
-		
-		session.remove(account);
-		session.beginTransaction().commit();
-		
-		System.out.println("\n Account has been successfully deleted.");
+		try {
+			
+			System.out.println("Enter the Account Number :- ");
+			long acno = sc.nextLong();
+			
+			if(accnovalid(acno)==10)
+			{
+				Session session = HibernateUtil.getSessionFactory().openSession();
+				Account account = session.get(Account.class, acno);
+				
+				session.remove(account);
+				session.beginTransaction().commit();
+				
+				System.out.println("\n Account has been successfully deleted.");
+			}
+		}
+		catch(AccountNumberNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
+			view_account();
+		}
+		catch(NullPointerException e)
+		{
+			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
+			view_account();
+		}
 		
 	}
 
