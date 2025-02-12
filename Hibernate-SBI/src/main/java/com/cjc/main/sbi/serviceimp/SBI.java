@@ -2,6 +2,8 @@ package com.cjc.main.sbi.serviceimp;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.jar.Attributes.Name;
+
 import org.hibernate.Session;
 import com.cjc.main.sbi.service.RBI;
 import com.cjc.main.sbi.config.*;
@@ -10,6 +12,7 @@ import com.cjc.main.sbi.exc.AccountNumberNotValidException;
 import com.cjc.main.sbi.exc.AgeNotValidException;
 import com.cjc.main.sbi.exc.AmountNotValidException;
 import com.cjc.main.sbi.exc.MobileNumberNotValidException;
+import com.cjc.main.sbi.exc.NameNotValidException;
 import com.cjc.main.sbi.model.Account;
 
 public class SBI implements RBI {
@@ -77,6 +80,15 @@ public class SBI implements RBI {
 		return amt;
 	}
 	
+	public String namevalid(String name) throws NameNotValidException
+	{
+		if(!name.matches("[a-zA-Z]+"))
+		{
+			throw new NameNotValidException("Only characters are allowed");
+		}
+		return name;
+	}
+	
 
 	Scanner sc = new Scanner(System.in);
 	
@@ -108,14 +120,50 @@ public class SBI implements RBI {
 				create_account();
 			}
 		
-		System.out.println("Enter the First Name :- ");
-		account.setName(sc.next());
+		try
+		{
+			System.out.println("Enter the First Name :- ");
+			String name = sc.next();
+			if(namevalid(name).matches("[a-zA-Z]+"))
+			{
+				account.setName(name);
+			}
+		}
+		catch(NameNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter the account details");
+			create_account();
+		}
 		
-		System.out.println("Enter the Middle Name :- ");
-		account.setMidname(sc.next());
+		try
+		{
+			System.out.println("Enter the Middle Name :- ");
+			String name = sc.next();
+			if(namevalid(name).matches("[a-zA-Z]+"))
+			{
+				account.setMidname(name);
+			}
+		}
+		catch(NameNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter the account details");
+			create_account();
+		}
 		
-		System.out.println("Enter the Last Name :- ");
-		account.setSurname(sc.next());
+		try
+		{
+			System.out.println("Enter the Last Name :- ");
+			String name = sc.next();
+			if(namevalid(name).matches("[a-zA-Z]+"))
+			{
+				account.setSurname(name);
+			}
+		}
+		catch(NameNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter the account details");
+			create_account();
+		}
 		
 		System.out.println("Select the Gender :- \n 1. Male \n 2.Female ");
 		int i = sc.nextInt();
