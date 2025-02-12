@@ -5,6 +5,8 @@ import java.util.Scanner;
 import java.util.jar.Attributes.Name;
 
 import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
+
 import com.cjc.main.sbi.service.RBI;
 import com.cjc.main.sbi.config.*;
 import com.cjc.main.sbi.exc.AadharNotValidException;
@@ -270,8 +272,16 @@ public class SBI implements RBI {
 			create_account();
 		}
 		
-		session.persist(account);
-		session.beginTransaction().commit();
+		try{
+			session.persist(account);
+			session.beginTransaction().commit();
+		}
+		catch(ConstraintViolationException e)
+		{
+			System.out.println("Account Number or Aadhar number is already present.\nPlease enter a new Account Number or Aadhar number.");
+			create_account();
+		}
+		
 		
 	}
 
@@ -464,12 +474,12 @@ public class SBI implements RBI {
 		catch(AccountNumberNotValidException e)
 		{
 			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
-			view_account();
+			transaction();
 		}
 		catch(NullPointerException e)
 		{
 			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
-			view_account();
+			transaction();
 		}
 		
 		
@@ -499,12 +509,12 @@ public class SBI implements RBI {
 		catch(AccountNumberNotValidException e)
 		{
 			System.out.println(e.getMessage()+"Please enter a valid 10 digit account number");
-			view_account();
+			delete_account();
 		}
 		catch(NullPointerException e)
 		{
 			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
-			view_account();
+			delete_account();
 		}
 		
 	}
