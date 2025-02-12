@@ -5,6 +5,7 @@ import java.util.Scanner;
 import org.hibernate.Session;
 import com.cjc.main.sbi.service.RBI;
 import com.cjc.main.sbi.config.*;
+import com.cjc.main.sbi.exc.AadharNotValidException;
 import com.cjc.main.sbi.exc.AccountNumberNotValidException;
 import com.cjc.main.sbi.exc.AgeNotValidException;
 import com.cjc.main.sbi.exc.AmountNotValidException;
@@ -13,12 +14,13 @@ import com.cjc.main.sbi.model.Account;
 
 public class SBI implements RBI {
 	
-	public void agevalid(int age) throws AgeNotValidException
+	public int agevalid(int age) throws AgeNotValidException
 	{
 		if(age<18)
 		{
 			throw new AgeNotValidException("Age not valid, should be 18+ .");
 		}
+		return age;
 	}
 	
 	public int accnovalid(long acno) throws AccountNumberNotValidException
@@ -37,7 +39,7 @@ public class SBI implements RBI {
 		return size;
 	}
 	
-	public void mobnovalid(long mobno) throws MobileNumberNotValidException
+	public long mobnovalid(long mobno) throws MobileNumberNotValidException
 	{
 		int size = 0;
 		while(mobno!=0)
@@ -49,13 +51,30 @@ public class SBI implements RBI {
 		if(size!=10) {
 			throw new MobileNumberNotValidException("Mobile number should have 10 digits");
 		}
+		return size;
 	}
 	
-	public void amtzero(double amt) throws AmountNotValidException
+	public long aadharnovalid(long adno) throws AadharNotValidException
+	{
+		int size = 0;
+		while(adno!=0)
+		{
+			adno = adno/10;
+			size++;
+		}
+		
+		if(size!=12) {
+			throw new AadharNotValidException("Aadhar number should have 10 digits");
+		}
+		return size;
+	}
+	
+	public double amtzero(double amt) throws AmountNotValidException
 	{
 		if(amt==0 || amt<0) {
 			throw new AmountNotValidException("Amount should be greater than 0");
 		}
+		return amt;
 	}
 	
 
@@ -81,35 +100,13 @@ public class SBI implements RBI {
 			catch(AccountNumberNotValidException e)
 			{
 				System.out.println(e.getMessage()+"Please Enter the Account number of 10 digits only.");
+				create_account();
 			}
-		catch(InputMismatchException e)
-		{
-			System.out.println("Please Enter the Account number in digits only.");
-		}
-			
-			
-		
-		/*try
-		{
-			account.setAccno(account_no);
-		}
-		catch(InputMismatchException e)
-		{
-			
-			System.out.println("\nAccount can only have digits...\n");
-			create_account();
-		}
-		
-		try {
-			accnovalid(account_no);
-			account.setAccno(account_no);
-		}
-		catch(AccountNumberNotValidException e)
-		{
-			System.out.println(e.getMessage()+"\nPlease enter the details correctly");
-			create_account();
-		}*/
-		
+			catch(InputMismatchException e)
+			{
+				System.out.println("Please Enter the Account number in digits only.");
+				create_account();
+			}
 		
 		System.out.println("Enter the First Name :- ");
 		account.setName(sc.next());
@@ -141,53 +138,89 @@ public class SBI implements RBI {
 			create_account();
 		}
 		
-		System.out.println("Enter the Age :- ");
-		int age = sc.nextInt();
+		
 		
 		try
 		{
-			agevalid(age);
+			System.out.println("Enter the Age :- ");
+			int age = sc.nextInt();
+			
+			if(agevalid(age)>=18 || agevalid(age)<120)
+			{
+				account.setAge(age);
+			}
 		}
 		catch(AgeNotValidException e)
 		{
-			System.out.println(e.getMessage()+"\n");
+			System.out.println(e.getMessage()+"\nEnter the account details again... \\n");
 			create_account();
-			System.out.println("Enter the account details again... \n");
+			
 		}
-		account.setAge(age);
-
+		catch(InputMismatchException e)
+		{
+			System.out.println("Please enter a valid Age");
+			create_account();
+		}
 		
-		System.out.println("Enter the Contact Number :- ");
-		long conno = sc.nextLong();
+		
 		
 		try {
-			mobnovalid(conno);
+			System.out.println("Enter the Contact Number :- ");
+			long conno = sc.nextLong();
+			if(mobnovalid(conno)==10)
+			{
+				account.setMobno(conno);
+			}
 		}
 		catch(MobileNumberNotValidException e) {
 			System.out.println(e.getMessage()+"\nPlease enter the mobile number correctly...");
 			create_account();
 		}
-		account.setMobno(conno);
 		
-		System.out.println("Enter the Aadhar Number :- ");
-		account.setAadharno(sc.nextLong());
+		try
+		{
+			System.out.println("Enter the Aadhar Number :- ");
+			long adno = sc.nextLong();
+			if(aadharnovalid(adno)==12)
+			{
+				account.setAadharno(adno);
+			}
+		}
+		catch(AadharNotValidException e)
+		{
+			System.out.println(e.getMessage()+"Please enter 12 digits of Aadhar Number");
+			create_account();
+		}
+		catch(InputMismatchException e)
+		{
+			System.out.println("Please enter a valid Aadhar Number");
+			create_account();
+		}
 		
 		System.out.println("Enter the Permanent Address :- ");
 		account.setAddress(sc.next()+sc.nextLine());
 		
-		System.out.println("Enter the Account Balance :- ");
-		double bal = sc.nextDouble();
+		
 		
 		try
 		{
-			amtzero(bal);
+			System.out.println("Enter the Account Balance :- ");
+			double bal = sc.nextDouble();
+			if(amtzero(bal)>0)
+			{
+				account.setBalance(bal);
+			}
 		}
 		catch(AmountNotValidException e)
 		{
 			System.out.println(e.getMessage()+"\nFirst deposit should be greater than 0");
 			create_account();
 		}
-		account.setBalance(bal);
+		catch(InputMismatchException e)
+		{
+			System.out.println("Please enter a valid amount.");
+			create_account();
+		}
 		
 		session.persist(account);
 		session.beginTransaction().commit();
