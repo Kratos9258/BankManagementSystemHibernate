@@ -43,10 +43,14 @@ public class Test {
 			break;
 			
 		case 5:
-			sbi.delete_account();
+			sbi.check_balance();
 			break;
 			
 		case 6:
+			sbi.delete_account();
+			break;
+			
+		case 7:
 			System.exit(0);
 			
 		}

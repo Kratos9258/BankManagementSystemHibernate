@@ -6,6 +6,7 @@ public interface RBI {
 	public void view_account();
 	public void update_account();
 	public void transaction();
+	public void check_balance();
 	public void delete_account();
 	
 }

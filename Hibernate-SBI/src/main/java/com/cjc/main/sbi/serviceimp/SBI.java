@@ -226,6 +226,11 @@ public class SBI implements RBI {
 			System.out.println(e.getMessage()+"\nPlease enter the mobile number correctly...");
 			create_account();
 		}
+		catch(InputMismatchException e)
+		{
+			System.out.println("Please enter a valid contact Number");
+			create_account();
+		}
 		
 		try
 		{
@@ -302,14 +307,14 @@ public class SBI implements RBI {
 			{
 				
 				Account account = session.get(Account.class, acno);
-				System.out.println(account.getAccno());
-				System.out.println(account.getName()+" "+account.getMidname()+" "+account.getSurname());
-				System.out.println(account.getGender());
-				System.out.println(account.getAge());
-				System.out.println(account.getMobno());
-				System.out.println(account.getAadharno());
-				System.out.println(account.getAddress());
-				System.out.println(account.getBalance());
+				System.out.println("\nACCOUNT NUMBER :- "+account.getAccno());
+				System.out.println("NAME :- "+account.getName()+" "+account.getMidname()+" "+account.getSurname());
+				System.out.println("GENDER :- "+account.getGender());
+				System.out.println("AGE :- "+account.getAge());
+				System.out.println("CONTACT NUMBER :- "+account.getMobno());
+				System.out.println("AADHAR NUMBER :- "+account.getAadharno());
+				System.out.println("ADDRESS :- "+account.getAddress());
+				System.out.println("BALANCE :- "+account.getBalance()+"\n");
 			}
 		}
 		catch(AccountNumberNotValidException e)
@@ -349,36 +354,130 @@ public class SBI implements RBI {
 				
 				case 1:
 					System.out.println("Enter the Name to be updated :- ");
-					System.out.println("First Name :- ");
-					account.setName(sc.next());
 					
-					System.out.println("Middle Name :- ");
-					account.setMidname(sc.next());
+					try
+					{
+						System.out.println("First Name :- ");
+						String name = sc.next();
+						if(namevalid(name).matches("[a-zA-Z]+"))
+						{
+							account.setName(name);
+						}
+					}
+					catch(NameNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						update_account();
+					}
 					
-					System.out.println("Last Name :- ");
-					account.setSurname(sc.next());
+					try
+					{
+						System.out.println("Middle Name :- ");
+						String name = sc.next();
+						if(namevalid(name).matches("[a-zA-Z]+"))
+						{
+							account.setMidname(name);
+						}
+					}
+					catch(NameNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						update_account();
+					}
+					
+					try
+					{
+						System.out.println("Last Name :- ");
+						String name = sc.next();
+						if(namevalid(name).matches("[a-zA-Z]+"))
+						{
+							account.setSurname(name);
+						}
+					}
+					catch(NameNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						update_account();
+					}
 					
 					session.merge(account);
 					session.beginTransaction().commit();
 					break;
 					
 				case 2:
-					System.out.println("Enter the Age to be updated :- ");
-					account.setAge(sc.nextInt());
+					
+					try
+					{
+						System.out.println("Enter the Age to be updated :- ");
+						int age = sc.nextInt();
+						
+						if(agevalid(age)>=18 || agevalid(age)<120)
+						{
+							account.setAge(age);
+						}
+					}
+					catch(AgeNotValidException e)
+					{
+						System.out.println(e.getMessage());
+						update_account();
+						
+					}
+					catch(InputMismatchException e)
+					{
+						System.out.println("Please enter a valid Age");
+						update_account();
+					}
+					
 					session.merge(account);
 					session.beginTransaction().commit();
 					break;
 					
 				case 3:
-					System.out.println("Enter the Contact Number to be updated :- ");
-					account.setMobno(sc.nextLong());
+					
+					try {
+						System.out.println("Enter the Contact Number to be updated :- ");
+						long conno = sc.nextLong();
+						if(mobnovalid(conno)==10)
+						{
+							account.setMobno(conno);
+						}
+					}
+					catch(MobileNumberNotValidException e) {
+						System.out.println(e.getMessage()+"\nPlease enter the mobile number correctly...");
+						update_account();
+					}
+					catch(InputMismatchException e)
+					{
+						System.out.println("Please enter a valid contact Number");
+						update_account();
+					}
+					
 					session.merge(account);
 					session.beginTransaction().commit();
 					break;
 					
 				case 4:
-					System.out.println("Enter the Aadhar Number to be updated :- ");
-					account.setAadharno(sc.nextLong());
+					
+					try
+					{
+						System.out.println("Enter the Aadhar Number to be updated :- ");
+						long adno = sc.nextLong();
+						if(aadharnovalid(adno)==12)
+						{
+							account.setAadharno(adno);
+						}
+					}
+					catch(AadharNotValidException e)
+					{
+						System.out.println(e.getMessage()+"Please enter 12 digits of Aadhar Number");
+						update_account();
+					}
+					catch(InputMismatchException e)
+					{
+						System.out.println("Please enter a valid Aadhar Number");
+						update_account();
+					}
+					
 					session.merge(account);
 					session.beginTransaction().commit();
 					break;
@@ -430,21 +529,28 @@ public class SBI implements RBI {
 				switch(i)
 				{
 				case 1:
-					System.out.println("Enter the amount to withdraw :- ");
-					double wdt_bal = sc.nextDouble();
-					
 					try
 					{
+						System.out.println("Enter the amount to withdraw :- ");
+						double wdt_bal = sc.nextDouble();
+						
 						amtzero(wdt_bal);
+						
+						if((account.getBalance()-wdt_bal)>=1500) {
+							account.setBalance(account.getBalance()-wdt_bal);
+							session.merge(account);
+							session.beginTransaction().commit();
+						}
+						else {
+							System.out.println("You cannot withdraw beyond the amount.");
+							transaction();
+						}
 					}
 					catch(AmountNotValidException e)
 					{
 						System.out.println(e.getMessage());
 						transaction();
 					}
-					account.setBalance(account.getBalance()-wdt_bal);
-					session.merge(account);
-					session.beginTransaction().commit();
 					break;
 					
 				case 2:
@@ -481,6 +587,12 @@ public class SBI implements RBI {
 			System.out.println("No Account exist with the given account number. \nRe-Enter the account number");
 			transaction();
 		}
+		
+	}
+	
+	@Override
+	public void check_balance()
+	{	// TODO Auto-generated method stub
 		
 		
 		
